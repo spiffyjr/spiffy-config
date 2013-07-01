@@ -7,6 +7,7 @@ return array(
     ),
 
     'invokables' => array(
+        'SpiffyConfig\CacheListener'   => 'SpiffyConfig\CacheListener',
         'SpiffyConfig\RuntimeListener' => 'SpiffyConfig\RuntimeListener'
     )
 );

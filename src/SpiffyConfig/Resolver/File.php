@@ -48,6 +48,9 @@ class File extends AbstractResolver
      */
     public function resolve()
     {
+        if (0 === count($this->options->getPaths())) {
+            return array();
+        }
         return $this->getFileFinder();
     }
 }

@@ -13,7 +13,7 @@ class ConfigManager implements EventManagerAwareInterface
     /**
      * @var array
      */
-    protected $resolvers;
+    protected $resolvers = array();
 
     /**
      * @var EventManagerInterface
@@ -25,17 +25,24 @@ class ConfigManager implements EventManagerAwareInterface
      */
     protected $options;
 
+    /**
+     * @param ResolverInterface $resolver
+     * @return $this
+     */
     public function addResolver(ResolverInterface $resolver)
     {
         $this->resolvers[] = $resolver;
         return $this;
     }
 
+    /**
+     * Iterate through resolves and and fire the 'configure' event on each.
+     *
+     * @triggers configure
+     */
     public function configure()
     {
-        foreach ($this->resolvers as $resolver) {
-            $this->getEventManager()->trigger('configure', $resolver);
-        }
+        $this->getEventManager()->trigger('configure', $this->resolvers);
     }
 
     /**

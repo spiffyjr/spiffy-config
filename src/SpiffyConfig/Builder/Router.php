@@ -29,6 +29,6 @@ class Router extends AbstractRouter
 
         $this->assembleRoutes($config);
 
-        return $config;
+        return $config->getArrayCopy();
     }
 }

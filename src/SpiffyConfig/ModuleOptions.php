@@ -12,6 +12,11 @@ class ModuleOptions extends AbstractOptions
     protected $enableProduction = true;
 
     /**
+     * @var string
+     */
+    protected $autoloadFile;
+
+    /**
      * @var array
      */
     protected $configListeners = array();
@@ -73,5 +78,23 @@ class ModuleOptions extends AbstractOptions
     public function getResolvers()
     {
         return $this->resolvers;
+    }
+
+    /**
+     * @param string $autoloadFile
+     * @return $this
+     */
+    public function setAutoloadFile($autoloadFile)
+    {
+        $this->autoloadFile = $autoloadFile;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAutoloadFile()
+    {
+        return $this->autoloadFile;
     }
 }

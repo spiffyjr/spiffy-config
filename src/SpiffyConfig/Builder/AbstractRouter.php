@@ -65,6 +65,7 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
                 if (isset($routeSpec['type'])) {
                     $routeName = $this->discoverRouteName($annotation, $controllerSpec, $routeSpec);
                     if ($routeName) {
+                        unset($routeSpec['actionName']);
                         $config['router']['routes'][$routeName] = $routeSpec->getArrayCopy();
                     }
                 }
@@ -72,6 +73,10 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         }
     }
 
+    /**
+     * @param $annotations
+     * @return bool
+     */
     protected function checkForExcludeController($annotations)
     {
         $params   = array('annotations' => $annotations);
@@ -83,6 +88,10 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         return (bool) $results->last();
     }
 
+    /**
+     * @param $annotations
+     * @param ArrayObject $controllerSpec
+     */
     protected function configureController($annotations, ArrayObject $controllerSpec)
     {
         if ($this->checkForExcludeController($annotations, $controllerSpec)) {
@@ -102,6 +111,11 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         }
     }
 
+    /**
+     * @param $annotations
+     * @param ArrayObject $controllerSpec
+     * @return mixed|null
+     */
     protected function discoverControllerName($annotations, ArrayObject $controllerSpec)
     {
         $params   = array('annotations' => $annotations, 'controllerSpec' => $controllerSpec);
@@ -113,6 +127,12 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         return is_string($results->last()) ? $results->last() : null;
     }
 
+    /**
+     * @param $annotation
+     * @param ArrayObject $controllerSpec
+     * @param ArrayObject $routeSpec
+     * @return bool
+     */
     protected function checkForExcludeRoute($annotation, ArrayObject $controllerSpec, ArrayObject $routeSpec)
     {
         $params = array(
@@ -128,6 +148,11 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         return (bool) $results->last();
     }
 
+    /**
+     * @param $annotation
+     * @param ArrayObject $controllerSpec
+     * @param ArrayObject $routeSpec
+     */
     protected function configureRoute($annotation, ArrayObject $controllerSpec, ArrayObject $routeSpec)
     {
         if ($this->checkForExcludeRoute($annotation, $controllerSpec, $routeSpec)) {
@@ -143,6 +168,12 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         $this->getEventManager()->trigger(__FUNCTION__, $this, $params);
     }
 
+    /**
+     * @param $annotation
+     * @param ArrayObject $controllerSpec
+     * @param ArrayObject $routeSpec
+     * @return mixed|null
+     */
     protected function discoverRouteName($annotation, ArrayObject $controllerSpec, ArrayObject $routeSpec)
     {
         $params = array(
@@ -159,8 +190,15 @@ abstract class AbstractRouter extends AbstractAnnotationBuilder
         return is_string($results->last()) ? $results->last() : null;
     }
 
+    /**
+     * @param ArrayObject $config
+     * @throws \RuntimeException
+     */
     protected function assembleRoutes(ArrayObject $config)
     {
+        if (!isset($config['router'])) {
+            return;
+        }
         if (!isset($config['router']['routes'])) {
             return;
         }
