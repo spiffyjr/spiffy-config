@@ -2,15 +2,18 @@
 
 namespace SpiffyConfig\Builder;
 
-class TemplateMap extends AbstractBuilder
+use SpiffyConfig\Resolver;
+
+class TemplateMap implements BuilderInterface
 {
-    public function build()
+    /**
+     * {@inheritDoc}
+     */
+    public function build(Resolver\ResultInterface $result)
     {
-        /** @var \Symfony\Component\Finder\SplFileInfo $file */
-        $finder = $this->resolver->resolve();
         $config = array();
 
-        foreach ($finder as $file) {
+        foreach ($result as $file) {
             $basename = $file->getBasename('.' . $file->getExtension());
             $fullname = sprintf('%s/%s', $file->getRelativePath(), $basename);
 

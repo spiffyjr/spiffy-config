@@ -26,12 +26,12 @@ class Module implements
         /** @var \SpiffyConfig\ModuleOptions $options */
         $options = $sm->get('SpiffyConfig\ModuleOptions');
 
-        if ($options->getEnableProduction()) {
+        if (!$options->getEnabled()) {
             return;
         }
 
         $configManager = $sm->get('SpiffyConfig\ConfigManager');
-        $configManager->configure();
+        $configManager->configure($options->getRuntimeCollection());
     }
 
     /**
@@ -52,8 +52,14 @@ class Module implements
             '  [options] command [arguments]',
             '',
             $console->colorize('Available Commands:', ColorInterface::YELLOW),
-            array($console->colorize('  spiffyconfig build', ColorInterface::GREEN), 'build, or rebuild if present, the cache'),
-            array($console->colorize('  spiffyconfig clear', ColorInterface::GREEN), 'clear the cache'),
+            array(
+                $console->colorize('  spiffyconfig build', ColorInterface::GREEN),
+                'build, or rebuild if present, the cache'
+            ),
+            array(
+                $console->colorize('  spiffyconfig clear', ColorInterface::GREEN),
+                'clear the cache'
+            ),
         );
     }
 }

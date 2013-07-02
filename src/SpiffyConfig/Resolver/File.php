@@ -2,6 +2,7 @@
 
 namespace SpiffyConfig\Resolver;
 
+use ArrayIterator;
 use Symfony\Component\Finder\Finder;
 
 class File extends AbstractResolver
@@ -10,11 +11,6 @@ class File extends AbstractResolver
      * @var Finder
      */
     protected $finder;
-
-    /**
-     * @var FileOptions
-     */
-    protected $options;
 
     /**
      * @param array $options
@@ -49,8 +45,9 @@ class File extends AbstractResolver
     public function resolve()
     {
         if (0 === count($this->options->getPaths())) {
-            return array();
+            return new Result(new ArrayIterator(array()));
         }
-        return $this->getFileFinder();
+
+        return new Result($this->getFileFinder()->getIterator());
     }
 }

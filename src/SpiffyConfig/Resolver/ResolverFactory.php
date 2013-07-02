@@ -10,16 +10,21 @@ class ResolverFactory implements FactoryInterface
     /**
      * @var array
      */
+    protected $map = array(
+        'file' => 'SpiffyConfig\Resolver\File',
+    );
+
+    /**
+     * @var array
+     */
     protected $spec = array();
 
     /**
      * @param array $spec
-     * @return $this
      */
-    public function setSpec($spec)
+    public function __construct(array $spec)
     {
         $this->spec = $spec;
-        return $this;
     }
 
     /**
@@ -30,29 +35,24 @@ class ResolverFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $spec     = $this->spec;
-        $type     = isset($spec['type']) ? $spec['type'] : null;
-        $options  = isset($spec['options']) ? $spec['options'] : array();
-        $builders = isset($spec['builders']) ? $spec['builders'] : array();
+        $resolver = isset($this->spec['type']) ? $this->spec['type'] : null;
+        $options  = isset($this->spec['options']) ? $this->spec['options'] : array();
 
-        if (!is_string($type) || empty($type)) {
+        if (!$resolver) {
             // todo: throw exception
-            echo 'missing type';
-            exit;
+            echo 'missing type for resolver';
         }
 
-        /** @var ResolverInterface $resolver */
-        $resolver = new $type($options);
+        if (is_string($resolver)) {
+            $mapName = strtolower(trim($resolver));
 
-        foreach ($builders as $builder) {
-            if (is_string($builder)) {
-                if ($serviceLocator->has($builder)) {
-                    $builder = $serviceLocator->get($builder);
-                } else {
-                    $builder = new $builder;
-                }
+            if ($serviceLocator->has($resolver)) {
+                $resolver = $serviceLocator->get($resolver);
+            } elseif (isset($this->map[$mapName])) {
+                $resolver = new $this->map[$mapName]($options);
+            } else {
+                $resolver = new $resolver($options);
             }
-            $resolver->addBuilder($builder);
         }
 
         return $resolver;

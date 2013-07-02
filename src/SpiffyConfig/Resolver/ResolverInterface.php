@@ -2,11 +2,12 @@
 
 namespace SpiffyConfig\Resolver;
 
-use SpiffyConfig\Builder\BuilderInterface;
+use SpiffyConfig\Builder;
 
 interface ResolverInterface
 {
-    public function addBuilder(BuilderInterface $builder);
-    public function getBuilders();
+    /**
+     * @return ResultInterface
+     */
     public function resolve();
 }

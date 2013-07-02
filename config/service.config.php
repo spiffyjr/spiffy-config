@@ -2,12 +2,14 @@
 
 return array(
     'factories' => array(
-        'SpiffyConfig\ConfigManager' => 'SpiffyConfig\ConfigManagerFactory',
-        'SpiffyConfig\ModuleOptions' => 'SpiffyConfig\ModuleOptionsFactory',
+        'SpiffyConfig\Builder\Manager'  => 'SpiffyConfig\Builder\ManagerFactory',
+        'SpiffyConfig\Config\Manager'   => 'SpiffyConfig\Config\ManagerFactory',
+        'SpiffyConfig\Resolver\Manager' => 'SpiffyConfig\Resolver\ManagerFactory',
+        'SpiffyConfig\ModuleOptions'    => 'SpiffyConfig\ModuleOptionsFactory',
     ),
 
     'invokables' => array(
-        'SpiffyConfig\CacheListener'   => 'SpiffyConfig\CacheListener',
-        'SpiffyConfig\RuntimeListener' => 'SpiffyConfig\RuntimeListener'
+        'SpiffyConfig\Handler\Autoload' => 'SpiffyConfig\Handler\Autoload',
+        'SpiffyConfig\Handler\Runtime'  => 'SpiffyConfig\Handler\Runtime',
     )
 );

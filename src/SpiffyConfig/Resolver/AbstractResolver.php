@@ -2,31 +2,18 @@
 
 namespace SpiffyConfig\Resolver;
 
-use SpiffyConfig\Builder\BuilderInterface;
-
 abstract class AbstractResolver implements ResolverInterface
 {
     /**
-     * @var array
+     * @var \Zend\Stdlib\AbstractOptions
      */
-    protected $builders = array();
+    protected $options;
 
     /**
-     * @return array
+     * @return \Zend\Stdlib\AbstractOptions
      */
-    public function getBuilders()
+    public function getOptions()
     {
-        return $this->builders;
-    }
-
-    /**
-     * @param BuilderInterface $builder
-     * @return $this
-     */
-    public function addBuilder(BuilderInterface $builder)
-    {
-        $builder->setResolver($this);
-        $this->builders[] = $builder;
-        return $this;
+        return $this->options;
     }
 }

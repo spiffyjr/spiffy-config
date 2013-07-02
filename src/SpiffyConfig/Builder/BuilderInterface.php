@@ -2,18 +2,13 @@
 
 namespace SpiffyConfig\Builder;
 
-use SpiffyConfig\Resolver\ResolverInterface;
+use SpiffyConfig\Resolver;
 
 interface BuilderInterface
 {
     /**
-     * @param ResolverInterface $resolver
-     * @return BuilderInterface
+     * @param Resolver\ResultInterface $result
+     * @return array
      */
-    public function setResolver(ResolverInterface $resolver);
-
-    /**
-     * @return mixed
-     */
-    public function build();
+    public function build(Resolver\ResultInterface $result);
 }

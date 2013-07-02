@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
 
-abstract class AbstractAnnotationBuilder extends AbstractBuilder
+abstract class AbstractAnnotationBuilder implements BuilderInterface
 {
     /**
      * @var Annotations\Reader

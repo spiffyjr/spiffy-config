@@ -1,7 +1,8 @@
 <?php
 
-namespace SpiffyConfig;
+namespace SpiffyConfig\Handler;
 
+use SpiffyConfig\Config;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -10,8 +11,15 @@ use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayUtils;
 
-class CacheListener extends AbstractListenerAggregate implements ServiceLocatorAwareInterface
+class Autoload extends AbstractListenerAggregate implements
+    ServiceLocatorAwareInterface,
+    HandlerInterface
 {
+    /**
+     * @var array
+     */
+    protected $config = array();
+
     /**
      * @var ServiceLocatorInterface
      */
@@ -22,29 +30,29 @@ class CacheListener extends AbstractListenerAggregate implements ServiceLocatorA
      */
     public function attach(EventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach('configure', array($this, 'buildCache'));
+        $this->listeners[] = $events->attach(Config\Manager::EVENT_CONFIGURE, array($this, 'configure'));
+        $this->listeners[] = $events->attach(Config\Manager::EVENT_CONFIGURE_POST, array($this, 'configurePost'));
     }
 
     /**
-     * @param EventInterface $e
+     * @param Config\Event $event
      */
-    public function buildCache(EventInterface $e)
+    public function configure(Config\Event $event)
     {
-        $resolvers = $e->getTarget();
-        $config    = array();
+        $resolver     = $event->getResolver();
+        $builder      = $event->getBuilder();
+        $this->config = ArrayUtils::merge($this->config, $builder->build($resolver->resolve()));
+    }
 
-        /** @var \SpiffyConfig\Resolver\ResolverInterface $resolver */
-        foreach ($resolvers as $resolver) {
-            /** @var \SpiffyConfig\Builder\BuilderInterface $builder */
-            foreach ($resolver->getBuilders() as $builder) {
-                $config = ArrayUtils::merge($config, $builder->build($resolver));
-            }
-        }
-
+    /**
+     * @param EventInterface $event
+     */
+    public function configurePost(EventInterface $event)
+    {
         /** @var \SpiffyConfig\ModuleOptions $options */
         $options = $this->getServiceLocator()->get('SpiffyConfig\ModuleOptions');
         $file    = $options->getAutoloadFile();
-        $config  = sprintf('<?%sreturn %s;%s', PHP_EOL, var_export($config, true), PHP_EOL);
+        $config  = sprintf('<?php%sreturn %s;%s', PHP_EOL, var_export($this->config, true), PHP_EOL);
 
         file_put_contents($file, $config);
     }

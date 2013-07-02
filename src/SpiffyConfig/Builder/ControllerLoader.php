@@ -2,17 +2,19 @@
 
 namespace SpiffyConfig\Builder;
 
+use SpiffyConfig\Resolver;
 use Zend\Code\Reflection\FileReflection;
 
-class ControllerLoader extends AbstractAnnotationBuilder
+class ControllerLoader implements BuilderInterface
 {
-    public function build()
+    /**
+     * {@inheritDoc}
+     */
+    public function build(Resolver\ResultInterface $result)
     {
-        /** @var \Symfony\Component\Finder\SplFileInfo $file */
-        $finder = $this->resolver->resolve();
         $config = array();
 
-        foreach ($finder as $file) {
+        foreach ($result as $file) {
             $filename = $file->getRealPath();
 
             if (!in_array($file->getRealPath(), get_included_files())) {
