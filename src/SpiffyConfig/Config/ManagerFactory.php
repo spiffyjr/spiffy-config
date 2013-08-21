@@ -2,7 +2,7 @@
 
 namespace SpiffyConfig\Config;
 
-use SpiffyConfig\Config;
+use Zend\ServiceManager\Config;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -24,11 +24,11 @@ class ManagerFactory implements FactoryInterface
         $builderManager  = $serviceLocator->get('SpiffyConfig\Builder\Manager');
         $resolverManager = $serviceLocator->get('SpiffyConfig\Resolver\Manager');
 
-        $configManager->addPeeringServiceManager($serviceLocator);
+        $configManager->setServiceLocator($serviceLocator);
         $configManager->setBuilderManager($builderManager);
         $configManager->setResolverManager($resolverManager);
 
-        $config = new Config\ManagerConfig($options->getCollections());
+        $config = new Config($options->getCollectionManager());
         $config->configureServiceManager($configManager);
 
         $handlers = $options->getHandlers();

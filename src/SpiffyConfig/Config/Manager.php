@@ -2,14 +2,16 @@
 
 namespace SpiffyConfig\Config;
 
+use RuntimeException;
 use SpiffyConfig\Builder;
 use SpiffyConfig\Handler;
 use SpiffyConfig\Resolver;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
-use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception;
 
-class Manager extends ServiceManager
+class Manager extends AbstractPluginManager
 {
     const EVENT_CONFIGURE      = 'configure';
     const EVENT_CONFIGURE_POST = 'configure.post';
@@ -115,5 +117,19 @@ class Manager extends ServiceManager
         }
 
         $this->eventManager->trigger(static::EVENT_CONFIGURE_POST, $this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validatePlugin($plugin)
+    {
+        if (!$plugin instanceof Collection) {
+            throw new RuntimeException(sprintf(
+                'Resolver of type %s is invalid; must implement %s\Collection',
+                (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
+                __NAMESPACE__
+            ));
+        }
     }
 }

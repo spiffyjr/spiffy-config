@@ -33,55 +33,46 @@ return array(
     ),
 
     'spiffy_config' => array(
-        'collections' => array(
-            'factory_config' => array(
-                'default' => array(
-                    /*
-                    array(
-                        'resolver' => 'controllers',
-                        'builders' => array(
-                            'ControllerLoader',
-                            'Router',
-                        )
-                    ),
+        'collection_manager' => array(
+            'abstract_factories' => array(
+                'SpiffyConfig\Config\AbstractCollectionFactory',
+            ),
+        ),
 
-                    array(
-                        'resolver' => 'phtml',
-                        'builders' => array(
-                            'TemplateMap'
-                        )
-                    )
-                    */
-                )
-            )
+        'resolver_manager' => array(
+            'abstract_factories' => array(
+                'SpiffyConfig\Resolver\AbstractFactory'
+            ),
+        ),
+
+        'collections' => array(
+            'default' => array()
+        ),
+
+        'resolvers' => array(
+            'controller' => array(
+                'type' => 'SpiffyConfig\Resolver\File',
+                'options' => array(
+                    'paths' => array(
+                        //'module/Application/src/Application/Controller'
+                    ),
+                    'name' => '*.php',
+                ),
+            ),
+
+            'phtml' => array(
+                'type' => 'SpiffyConfig\Resolver\File',
+                'options' => array(
+                    'paths' => array(
+                        //'module/Application/view'
+                    ),
+                    'name' => '*.phtml'
+                ),
+            ),
         ),
 
         'handlers' => array(
             'SpiffyConfig\Handler\Runtime'
-        ),
-
-        'resolvers' => array(
-            'factory_config' => array(
-                'controllers' => array(
-                    'type' => 'SpiffyConfig\Resolver\File',
-                    'options' => array(
-                        'paths' => array(
-                            //'module/Application/src/Application/Controller'
-                        ),
-                        'name' => '*.php',
-                    ),
-                ),
-
-                'phtml' => array(
-                    'type' => 'SpiffyConfig\Resolver\File',
-                    'options' => array(
-                        'paths' => array(
-                            //'module/Application/view'
-                        ),
-                        'name' => '*.phtml'
-                    ),
-                )
-            )
         ),
     ),
 

@@ -2,6 +2,7 @@
 
 namespace SpiffyConfig;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Zend\Console\Adapter\AdapterInterface;
 use Zend\Console\ColorInterface;
 use Zend\EventManager\EventInterface;
@@ -29,6 +30,8 @@ class Module implements
         if (!$options->getEnabled()) {
             return;
         }
+
+        AnnotationRegistry::registerAutoloadNamespace('SpiffyConfig\Annotation', array(__DIR__ . '/..'));
 
         $configManager = $sm->get('SpiffyConfig\ConfigManager');
         $configManager->configure($options->getRuntimeCollection());

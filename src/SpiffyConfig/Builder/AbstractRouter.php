@@ -3,7 +3,6 @@
 namespace SpiffyConfig\Builder;
 
 use ArrayObject;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use ReflectionClass;
 use SpiffyConfig\Annotation\Route;
 

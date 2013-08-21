@@ -62,8 +62,27 @@ class Runtime extends AbstractListenerAggregate implements
                 return;
             }
 
+            /** @var \Zend\View\Resolver\TemplateMapResolver $templateMap */
             $templateMap = $this->serviceLocator->get('ViewTemplateMapResolver');
-            $templateMap->merge($config['view_manager']['template_map']);
+
+            // Twig autoloading
+            if ($this->getServiceLocator()->has('ZfcTwigLoaderTemplateMap')) {
+                /** @var \ZfcTwig\Twig\MapLoader $twigLoader */
+                $twigLoader = $this->getServiceLocator()->get('ZfcTwigLoaderTemplateMap');
+
+                /** @var \ZfcTwig\Twig\StackLoader $twigStack*/
+                $twigStack  = $this->getServiceLocator()->get('ZfcTwigLoaderTemplatePathStack');
+
+                foreach ($config['view_manager']['template_map'] as $name => $path) {
+                    if (strstr($path, $twigStack->getDefaultSuffix())) {
+                        $twigLoader->add($name, $path);
+                    } else {
+                        $templateMap->add($name, $path);
+                    }
+                }
+            } else {
+                $templateMap->merge($config['view_manager']['template_map']);
+            }
         } else {
             $builderClass = get_class($builder);
 

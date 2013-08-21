@@ -39,16 +39,22 @@ class ModuleOptions extends AbstractOptions
     protected $enabled = true;
 
     /**
-     * A service manager configuration of builders to be registered with the builder manager.
-     * An additional `factory_config` key is used to create builders from an array.
+     * Service manager configuration for builder manager.
      *
      * @var array
      */
-    protected $builders = array();
+    protected $builderManager = array();
 
     /**
-     * A service manager configuration of collections to be registered with the config manager.
-     * An additional `factory_config` key is used to create collections from an array.
+     * Service manager configuration for collection manager.
+     *
+     * @var array
+     */
+    protected $collectionManager = array();
+
+    /**
+     * A configuration of collections to be registered with the config manager. This is handled by the
+     * SpiffyConfig\Config\AbstractCollectionFactory.
      *
      * @var array
      */
@@ -63,8 +69,15 @@ class ModuleOptions extends AbstractOptions
     protected $handlers = array();
 
     /**
-     * A service manager configuration of resolvers to be registered with the resolver manager.
-     * An additional `factory_config` key is used to create resolvers from an array.
+     * Service manager configuration for resolver manager.
+     *
+     * @var array
+     */
+    protected $resolverManager = array();
+
+    /**
+     * A of resolvers to be registered with the resolver manager. This is handled by the
+     * SpiffyConfig\Resolver\AbstractFactory.
      *
      * @var array
      */
@@ -86,24 +99,6 @@ class ModuleOptions extends AbstractOptions
     public function getAutoloadFile()
     {
         return $this->autoloadFile;
-    }
-
-    /**
-     * @param array $builders
-     * @return $this
-     */
-    public function setBuilders($builders)
-    {
-        $this->builders = $builders;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getBuilders()
-    {
-        return $this->builders;
     }
 
     /**
@@ -212,5 +207,59 @@ class ModuleOptions extends AbstractOptions
     public function getCliCollection()
     {
         return $this->cliCollection;
+    }
+
+    /**
+     * @param array $resolverManager
+     * @return $this
+     */
+    public function setResolverManager($resolverManager)
+    {
+        $this->resolverManager = $resolverManager;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResolverManager()
+    {
+        return $this->resolverManager;
+    }
+
+    /**
+     * @param array $collectionManager
+     * @return $this
+     */
+    public function setCollectionManager($collectionManager)
+    {
+        $this->collectionManager = $collectionManager;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCollectionManager()
+    {
+        return $this->collectionManager;
+    }
+
+    /**
+     * @param array $builderManager
+     * @return $this
+     */
+    public function setBuilderManager($builderManager)
+    {
+        $this->builderManager = $builderManager;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuilderManager()
+    {
+        return $this->builderManager;
     }
 }

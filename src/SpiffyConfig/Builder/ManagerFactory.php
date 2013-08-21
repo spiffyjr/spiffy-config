@@ -17,7 +17,7 @@ class ManagerFactory implements ServiceManager\FactoryInterface
         /** @var \SpiffyConfig\ModuleOptions $options */
         $options = $serviceLocator->get('SpiffyConfig\ModuleOptions');
         $manager = new Manager();
-        $config  = new ServiceManager\Config($options->getBuilders());
+        $config  = new ServiceManager\Config($options->getBuilderManager());
 
         $manager->addPeeringServiceManager($serviceLocator);
         $config->configureServiceManager($manager);
