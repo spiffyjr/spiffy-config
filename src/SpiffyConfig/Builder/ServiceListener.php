@@ -51,7 +51,13 @@ class ServiceListener extends AbstractListenerAggregate
                 ));
             }
 
-            $spec[$annotation->key][$annotation->type][$name] = $className;
+            $keyParts = explode('|', $annotation->key);
+
+            foreach ($keyParts as $part) {
+                $spec = &$spec[$part];
+            }
+
+            $spec[$annotation->type][$name] = $className;
         }
     }
 
