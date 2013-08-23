@@ -49,27 +49,7 @@ return array(
             'default' => array()
         ),
 
-        'resolvers' => array(
-            'controller' => array(
-                'type' => 'SpiffyConfig\Resolver\File',
-                'options' => array(
-                    'paths' => array(
-                        //'module/Application/src/Application/Controller'
-                    ),
-                    'name' => '*.php',
-                ),
-            ),
-
-            'phtml' => array(
-                'type' => 'SpiffyConfig\Resolver\File',
-                'options' => array(
-                    'paths' => array(
-                        //'module/Application/view'
-                    ),
-                    'name' => '*.phtml'
-                ),
-            ),
-        ),
+        'resolvers' => array(),
 
         'handlers' => array(
             'SpiffyConfig\Handler\Runtime'

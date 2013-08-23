@@ -70,7 +70,7 @@ abstract class AbstractServiceManager extends AbstractAnnotationBuilder
         $spec = new ArrayObject();
         $this->configure($annotations, $spec, $className, $name);
 
-        $config->exchangeArray(array_merge($config->getArrayCopy(), $spec->getArrayCopy()));
+        $config->exchangeArray(array_merge_recursive($config->getArrayCopy(), $spec->getArrayCopy()));
     }
 
     /**
