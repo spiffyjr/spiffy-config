@@ -5,7 +5,7 @@ namespace SpiffyConfig\Annotation\Route;
 /**
  * @Annotation
  */
-class Literal extends AbstractType
+class Literal extends AbstractRoute
 {
     /**
      * @var string

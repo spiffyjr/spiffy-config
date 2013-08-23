@@ -50,14 +50,20 @@ class Runtime extends AbstractListenerAggregate implements
         $builder  = $event->getBuilder();
         $config   = $builder->build($resolver->resolve());
 
-        if ($builder instanceof Builder\Router) {
+        if ($builder instanceof Builder\RouteBuilder) {
             if (!isset($config['router']['routes'])) {
                 return;
             }
 
             $router = $this->serviceLocator->get('Router');
             $router->addRoutes($config['router']['routes']);
-        } elseif ($builder instanceof Builder\TemplateMap) {
+        } else if ($builder instanceof Builder\AbstractServiceManager) {
+            if (isset($config['controllers'])) {
+                /** @var \Zend\Mvc\Controller\ControllerManager $loader */
+                $serviceConfig = new ServiceManager\Config($config['controllers']);
+                $serviceConfig->configureServiceManager($this->getServiceLocator()->get('ControllerLoader'));
+            }
+        } else if ($builder instanceof Builder\TemplateMapBuilder) {
             if (!isset($config['view_manager']['template_map'])) {
                 return;
             }

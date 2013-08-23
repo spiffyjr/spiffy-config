@@ -19,9 +19,9 @@ class ManagerFactory implements FactoryInterface
         /** @var \SpiffyConfig\ModuleOptions $options */
         $options = $serviceLocator->get('SpiffyConfig\ModuleOptions');
         $manager = new Manager();
-        $config  = new Config($options->getResolverManager());
-
         $manager->setServiceLocator($serviceLocator);
+
+        $config = new Config($options->getResolverManager());
         $config->configureServiceManager($manager);
 
         return $manager;

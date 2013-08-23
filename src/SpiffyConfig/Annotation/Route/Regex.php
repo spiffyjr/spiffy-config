@@ -5,20 +5,10 @@ namespace SpiffyConfig\Annotation\Route;
 /**
  * @Annotation
  */
-class Regex extends AbstractType
+class Regex extends AbstractRoute
 {
     /**
      * @var string
      */
-    public $routeKey = 'regex';
-
-    /**
-     * @var string
-     */
     public $type = 'regex';
-
-    /**
-     * @var string
-     */
-    public $spec;
 }

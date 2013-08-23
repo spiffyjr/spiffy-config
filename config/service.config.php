@@ -9,7 +9,7 @@ return array(
     ),
 
     'invokables' => array(
-        'SpiffyConfig\Handler\Autoload' => 'SpiffyConfig\Handler\Autoload',
-        'SpiffyConfig\Handler\Runtime'  => 'SpiffyConfig\Handler\Runtime',
+        'SpiffyConfig\Handler\ConfigWriter' => 'SpiffyConfig\Handler\ConfigWriter',
+        'SpiffyConfig\Handler\Runtime'      => 'SpiffyConfig\Handler\Runtime',
     )
 );

@@ -3,8 +3,9 @@
 namespace SpiffyConfig\Builder;
 
 use SpiffyConfig\Resolver;
+use Symfony\Component\Finder\SplFileInfo;
 
-class TemplateMap implements BuilderInterface
+class TemplateMapBuilder implements BuilderInterface
 {
     /**
      * {@inheritDoc}
@@ -14,6 +15,12 @@ class TemplateMap implements BuilderInterface
         $config = array();
 
         foreach ($result as $file) {
+            if (!$file instanceof SplFileInfo) {
+                throw new \RuntimeException(
+                    'Builder only operates on Resolver\File results'
+                );
+            }
+
             $basename = $file->getBasename('.' . $file->getExtension());
             $fullname = sprintf('%s/%s', $file->getRelativePath(), $basename);
 

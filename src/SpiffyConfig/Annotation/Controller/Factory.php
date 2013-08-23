@@ -2,9 +2,15 @@
 
 namespace SpiffyConfig\Annotation\Controller;
 
+use SpiffyConfig\Annotation\Service;
+
 /**
  * @Annotation
  */
-class Factory extends AbstractType
+class Factory extends Service\Invokable
 {
+    /**
+     * @var string
+     */
+    public $key = 'controllers';
 }

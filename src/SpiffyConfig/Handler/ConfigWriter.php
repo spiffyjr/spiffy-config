@@ -11,7 +11,7 @@ use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayUtils;
 
-class Autoload extends AbstractListenerAggregate implements
+class ConfigWriter extends AbstractListenerAggregate implements
     ServiceLocatorAwareInterface,
     HandlerInterface
 {

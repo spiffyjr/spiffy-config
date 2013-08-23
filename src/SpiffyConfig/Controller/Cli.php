@@ -16,9 +16,9 @@ class Cli extends AbstractActionController
     protected $configManager;
 
     /**
-     * @var Handler\Autoload
+     * @var Handler\ConfigWriter
      */
-    protected $autoloadHandler;
+    protected $configWriter;
 
     /**
      * @var ModuleOptions
@@ -61,7 +61,7 @@ class Cli extends AbstractActionController
      */
     public function setConfigManager(Config\Manager $configManager)
     {
-        $configManager->addHandler($this->getAutoloadHandler());
+        $configManager->addHandler($this->getConfigWriter());
         $this->configManager = $configManager;
         return $this;
     }
@@ -78,24 +78,24 @@ class Cli extends AbstractActionController
     }
 
     /**
-     * @param Handler\Autoload $autoloadHandler
+     * @param Handler\ConfigWriter $configWriter
      * @return $this
      */
-    public function setAutoloadHandler(Handler\Autoload $autoloadHandler)
+    public function setConfigWriter(Handler\ConfigWriter $configWriter)
     {
-        $this->autoloadHandler = $autoloadHandler;
+        $this->configWriter = $configWriter;
         return $this;
     }
 
     /**
-     * @return Handler\Autoload
+     * @return Handler\ConfigWriter
      */
-    public function getAutoloadHandler()
+    public function getConfigWriter()
     {
-        if (!$this->autoloadHandler instanceof Handler\Autoload) {
-            $this->setAutoloadHandler($this->getServiceLocator()->get('SpiffyConfig\Handler\Autoload'));
+        if (!$this->configWriter instanceof Handler\ConfigWriter) {
+            $this->setConfigWriter($this->getServiceLocator()->get('SpiffyConfig\Handler\ConfigWriter'));
         }
-        return $this->autoloadHandler;
+        return $this->configWriter;
     }
 
     /**
