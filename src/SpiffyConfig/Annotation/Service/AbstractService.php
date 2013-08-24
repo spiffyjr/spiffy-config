@@ -9,7 +9,7 @@ abstract class AbstractService extends Annotation
     /**
      * @var string
      */
-    public $key;
+    public $key = 'service_manager';
 
     /**
      * @var string
