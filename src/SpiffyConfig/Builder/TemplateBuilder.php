@@ -5,12 +5,12 @@ namespace SpiffyConfig\Builder;
 use SpiffyConfig\Resolver;
 use Symfony\Component\Finder\SplFileInfo;
 
-class TemplateMapBuilder implements BuilderInterface
+class TemplateBuilder extends AbstractBuilder implements BuilderInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function build(Resolver\ResultInterface $result)
+    public function build($result)
     {
         $config = array();
 

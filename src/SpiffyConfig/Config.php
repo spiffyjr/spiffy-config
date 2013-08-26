@@ -1,14 +1,11 @@
 <?php
 
-namespace SpiffyConfig\Config;
-
-use SpiffyConfig\Builder;
-use SpiffyConfig\Resolver;
+namespace SpiffyConfig;
 
 class Config
 {
     /**
-     * @var array
+     * @var Builder\BuilderInterface[]
      */
     protected $builders;
 
@@ -26,7 +23,7 @@ class Config
     }
 
     /**
-     * @return \SpiffyConfig\Resolver\ResolverInterface
+     * @return Resolver\ResolverInterface
      */
     public function getResolver()
     {
@@ -49,5 +46,19 @@ class Config
     public function getBuilders()
     {
         return $this->builders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMergedConfig()
+    {
+        $config = array();
+        $result = $this->resolver->resolve();
+
+        foreach ($this->builders as $builder) {
+            $config = array_merge_recursive($config, $builder->build($result));
+        }
+        return $config;
     }
 }

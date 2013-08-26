@@ -1,8 +1,8 @@
 <?php
 
-namespace SpiffyConfig\Resolver;
+namespace SpiffyConfig\Builder;
 
-abstract class AbstractResolver implements ResolverInterface
+abstract class AbstractBuilder implements BuilderInterface
 {
     /**
      * @var array
@@ -17,13 +17,5 @@ abstract class AbstractResolver implements ResolverInterface
     {
         $this->options = $options;
         return $this;
-    }
-
-    /**
-     * @return \Zend\Stdlib\AbstractOptions
-     */
-    public function getOptions()
-    {
-        return $this->options;
     }
 }

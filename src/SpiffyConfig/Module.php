@@ -3,38 +3,66 @@
 namespace SpiffyConfig;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use SpiffyConfig\Builder\BuilderFactory;
+use SpiffyConfig\Resolver\ResolverFactory;
 use Zend\Console\Adapter\AdapterInterface;
 use Zend\Console\ColorInterface;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\ModuleEvent;
+use Zend\ModuleManager\ModuleManagerInterface;
+use Zend\ServiceManager;
+use Zend\Stdlib\ArrayUtils;
 
 class Module implements
-    BootstrapListenerInterface,
     ConfigProviderInterface,
-    ConsoleUsageProviderInterface
+    ConsoleUsageProviderInterface,
+    InitProviderInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function onBootstrap(EventInterface $e)
+    public function init(ModuleManagerInterface $manager)
     {
-        /** @var \Zend\Mvc\MvcEvent $e */
-        $app = $e->getApplication();
-        $sm  = $app->getServiceManager();
+        $eventManager = $manager->getEventManager();
+        $eventManager->attach(
+            ModuleEvent::EVENT_LOAD_MODULES_POST,
+            array($this, 'onLoadModules'),
+            10000
+        );
+    }
 
-        /** @var \SpiffyConfig\ModuleOptions $options */
-        $options = $sm->get('SpiffyConfig\ModuleOptions');
+    /**
+     * loadModules callback. This sets up the config manager, builds the configuration, and sets the config
+     * listenere's merged config
+     *
+     * @param  $event
+     */
+    public function onLoadModules(ModuleEvent $event)
+    {
+        $configListener = $event->getConfigListener();
+        $config         = $configListener->getMergedConfig(false);
+        $spiffyConfig   = isset($config['spiffy_config']) ? $config['spiffy_config'] : array();
 
-        if (!$options->getEnabled()) {
+        if (!isset($spiffyConfig['enabled'])
+            || $spiffyConfig['enabled'] !== true
+        ) {
             return;
         }
 
         AnnotationRegistry::registerAutoloadNamespace('SpiffyConfig\Annotation', array(__DIR__ . '/..'));
 
-        $configManager = $sm->get('SpiffyConfig\ConfigManager');
-        $configManager->configure($options->getRuntimeCollection());
+        $manager     = ConfigManager::create($spiffyConfig);
+        $collections = isset($spiffyConfig['runtime_collections']) ? $spiffyConfig['runtime_collections'] : array();
+        $collections = is_array($collections) ? $collections : array($collections);
+
+        foreach ($collections as $name) {
+            $config = ArrayUtils::merge($config, $manager->configure($name));
+        }
+        $configListener->setMergedConfig($config);
     }
 
     /**

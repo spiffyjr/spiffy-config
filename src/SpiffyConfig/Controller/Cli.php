@@ -2,32 +2,18 @@
 
 namespace SpiffyConfig\Controller;
 
-use SpiffyConfig\Config;
-use SpiffyConfig\Handler;
-use SpiffyConfig\ModuleOptions;
+use SpiffyConfig\ConfigManager;
 use Zend\Console\ColorInterface;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Stdlib\ArrayUtils;
 
 class Cli extends AbstractActionController
 {
     /**
-     * @var Config\Manager
+     * @var ConfigManager
      */
     protected $configManager;
 
-    /**
-     * @var Handler\ConfigWriter
-     */
-    protected $configWriter;
-
-    /**
-     * @var ModuleOptions
-     */
-    protected $moduleOptions;
-
-    /**
-     * @throws \SpiffyConfig\Exception\RuntimeException
-     */
     public function buildAction()
     {
         $this->clearCache();
@@ -36,30 +22,39 @@ class Cli extends AbstractActionController
         $console = $this->getServiceLocator()->get('console');
         $console->writeLine('building cache, please wait...', ColorInterface::YELLOW);
 
-        $manager = $this->getConfigManager();
-        $manager->configure($this->getModuleOptions()->getCliCollection());
+        $options     = $this->getOptions();
+        $collections = $options['cache_collections'];
+
+        if (!is_array($collections)) {
+            $collections = array($collections);
+        }
+
+        $config = array();
+        foreach ($collections as $name) {
+            $config = ArrayUtils::merge($config, $this->getConfigManager()->configure($name));
+        }
+
+        $cacheFile    = $options['cache_file'];
+        $fileContents = sprintf('<?php%sreturn %s;%s', PHP_EOL, var_export($config, true), PHP_EOL);
+        file_put_contents($cacheFile, $fileContents);
 
         $console->writeLine('success!', ColorInterface::GREEN);
     }
 
-    /**
-     * @throws \SpiffyConfig\Exception\RuntimeException
-     */
     public function clearAction()
     {
         /** @var \Zend\Console\Adapter\AdapterInterface $console */
         $console = $this->getServiceLocator()->get('console');
 
         $this->clearCache();
-
         $console->writeLine('success!', ColorInterface::GREEN);
     }
 
     /**
-     * @param Config\Manager $configManager
+     * @param ConfigManager $configManager
      * @return $this
      */
-    public function setConfigManager(Config\Manager $configManager)
+    public function setConfigManager(ConfigManager $configManager)
     {
         $configManager->addHandler($this->getConfigWriter());
         $this->configManager = $configManager;
@@ -67,56 +62,23 @@ class Cli extends AbstractActionController
     }
 
     /**
-     * @return Config\Manager
+     * @return ConfigManager
      */
     public function getConfigManager()
     {
-        if (!$this->configManager instanceof Config\Manager) {
-            $this->setConfigManager($this->getServiceLocator()->get('SpiffyConfig\Config\Manager'));
+        if (!$this->configManager instanceof ConfigManager) {
+            $this->configManager = ConfigManager::create($this->getOptions());
         }
         return $this->configManager;
     }
 
     /**
-     * @param Handler\ConfigWriter $configWriter
-     * @return $this
+     * @return array
      */
-    public function setConfigWriter(Handler\ConfigWriter $configWriter)
+    public function getOptions()
     {
-        $this->configWriter = $configWriter;
-        return $this;
-    }
-
-    /**
-     * @return Handler\ConfigWriter
-     */
-    public function getConfigWriter()
-    {
-        if (!$this->configWriter instanceof Handler\ConfigWriter) {
-            $this->setConfigWriter($this->getServiceLocator()->get('SpiffyConfig\Handler\ConfigWriter'));
-        }
-        return $this->configWriter;
-    }
-
-    /**
-     * @param \SpiffyConfig\ModuleOptions $moduleOptions
-     * @return $this
-     */
-    public function setModuleOptions($moduleOptions)
-    {
-        $this->moduleOptions = $moduleOptions;
-        return $this;
-    }
-
-    /**
-     * @return \SpiffyConfig\ModuleOptions
-     */
-    public function getModuleOptions()
-    {
-        if (!$this->moduleOptions instanceof ModuleOptions) {
-            $this->setModuleOptions($this->getServiceLocator()->get('SpiffyConfig\ModuleOptions'));
-        }
-        return $this->moduleOptions;
+        $config = $this->getServiceLocator()->get('Configuration');
+        return $config['spiffy_config'];
     }
 
     /**
@@ -128,8 +90,8 @@ class Cli extends AbstractActionController
         $console = $this->getServiceLocator()->get('console');
         $console->writeLine('clearing cache, please wait...', ColorInterface::YELLOW);
 
-        $options = $this->getModuleOptions();
-        $file    = $options->getAutoloadFile();
+        $options = $this->getOptions();
+        $file    = $options['cache_file'];
 
         if (file_exists($file)) {
             unlink($file);

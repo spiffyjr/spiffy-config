@@ -7,31 +7,8 @@ use Zend\Stdlib\AbstractOptions;
 class ModuleOptions extends AbstractOptions
 {
     /**
-     * The name of the file that's generated via the CLI for production usage. This file
-     * needs to be available from your glob_path in application.config.php so it's automatically
-     * merged with your application configuration at runtime.
-     *
-     * @var string
-     */
-    protected $autoloadFile = 'config/autoload/spiffyconfig.local.php';
-
-    /**
-     * The collection to be ran during runtime when enabled is true.
-     *
-     * @var string
-     */
-    protected $runtimeCollection = 'default';
-
-    /**
-     * The collection to be ran when generating the autoload from CLI.
-     *
-     * @var string
-     */
-    protected $cliCollection = 'default';
-
-    /**
      * Whether or not the module is enabled. You want this to be `true` during development so that
-     * configurations can be generated at runtime. On production you should generate the autoload file
+     * configurations can be generated at runtime. On production you should generate the cache file
      * and set this to false for performance.
      *
      * @var bool
@@ -39,66 +16,119 @@ class ModuleOptions extends AbstractOptions
     protected $enabled = true;
 
     /**
-     * Service manager configuration for builder manager.
+     * The name of the file that's generated via the CLI for production usage. This file
+     * needs to be available from your glob_path in application.config.php so it's automatically
+     * merged with your application configuration at runtime.
+     *
+     * @var string
+     */
+    protected $cacheFile = 'config/autoload/spiffyconfig.local.php';
+
+    /**
+     * The collections to build and merge during runtime.
+     *
+     * @var string
+     */
+    protected $runtimeCollections = array('default');
+
+    /**
+     * The collections to use when building the cache.
+     *
+     * @var string
+     */
+    protected $cacheCollections = array('default');
+
+    /**
+     * Builders work on resolvers to create the configuration files.
      *
      * @var array
      */
-    protected $builderManager = array();
+    protected $builders = array();
 
     /**
-     * Service manager configuration for collection manager.
-     *
-     * @var array
-     */
-    protected $collectionManager = array();
-
-    /**
-     * A configuration of collections to be registered with the config manager. This is handled by the
-     * SpiffyConfig\Config\AbstractCollectionFactory.
-     *
-     * @var array
-     */
-    protected $collections = array();
-
-    /**
-     * An array of handlers to be registered for handling the configuration returned by collections.
-     * Each key can be the FQCN or a service manager alias.
-     *
-     * @var array
-     */
-    protected $handlers = array();
-
-    /**
-     * Service manager configuration for resolver manager.
-     *
-     * @var array
-     */
-    protected $resolverManager = array();
-
-    /**
-     * A of resolvers to be registered with the resolver manager. This is handled by the
-     * SpiffyConfig\Resolver\AbstractFactory.
+     * Resolvers locate files or information for builders to process.
      *
      * @var array
      */
     protected $resolvers = array();
 
     /**
-     * @param string $autoloadFile
+     * Collections are sets of builders identified by a name.
+     *
+     * @var array
+     */
+    protected $collections = array();
+
+    /**
+     * @param array $builders
      * @return $this
      */
-    public function setAutoloadFile($autoloadFile)
+    public function setBuilders($builders)
     {
-        $this->autoloadFile = $autoloadFile;
+        $this->builders = $builders;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuilders()
+    {
+        return $this->builders;
+    }
+
+    /**
+     * @param string $cacheCollections
+     * @return $this
+     */
+    public function setCacheCollections($cacheCollections)
+    {
+        $this->cacheCollections = $cacheCollections;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getAutoloadFile()
+    public function getCacheCollections()
     {
-        return $this->autoloadFile;
+        return $this->cacheCollections;
+    }
+
+    /**
+     * @param string $cacheFile
+     * @return $this
+     */
+    public function setCacheFile($cacheFile)
+    {
+        $this->cacheFile = $cacheFile;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheFile()
+    {
+        return $this->cacheFile;
+    }
+
+    /**
+     * @param array $collections
+     * @return $this
+     */
+    public function setCollections($collections)
+    {
+        $this->collections = $collections;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCollections()
+    {
+        return $this->collections;
     }
 
     /**
@@ -138,128 +168,20 @@ class ModuleOptions extends AbstractOptions
     }
 
     /**
-     * @param array $collections
+     * @param string $runtimeCollections
      * @return $this
      */
-    public function setCollections($collections)
+    public function setRuntimeCollections($runtimeCollections)
     {
-        $this->collections = $collections;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCollections()
-    {
-        return $this->collections;
-    }
-
-    /**
-     * @param array $handlers
-     * @return $this
-     */
-    public function setHandlers($handlers)
-    {
-        $this->handlers = $handlers;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getHandlers()
-    {
-        return $this->handlers;
-    }
-
-    /**
-     * @param string $runtimeCollection
-     * @return $this
-     */
-    public function setRuntimeCollection($runtimeCollection)
-    {
-        $this->runtimeCollection = $runtimeCollection;
+        $this->runtimeCollections = $runtimeCollections;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getRuntimeCollection()
+    public function getRuntimeCollections()
     {
-        return $this->runtimeCollection;
-    }
-
-    /**
-     * @param string $cliCollection
-     * @return $this
-     */
-    public function setCliCollection($cliCollection)
-    {
-        $this->cliCollection = $cliCollection;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCliCollection()
-    {
-        return $this->cliCollection;
-    }
-
-    /**
-     * @param array $resolverManager
-     * @return $this
-     */
-    public function setResolverManager($resolverManager)
-    {
-        $this->resolverManager = $resolverManager;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getResolverManager()
-    {
-        return $this->resolverManager;
-    }
-
-    /**
-     * @param array $collectionManager
-     * @return $this
-     */
-    public function setCollectionManager($collectionManager)
-    {
-        $this->collectionManager = $collectionManager;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCollectionManager()
-    {
-        return $this->collectionManager;
-    }
-
-    /**
-     * @param array $builderManager
-     * @return $this
-     */
-    public function setBuilderManager($builderManager)
-    {
-        $this->builderManager = $builderManager;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getBuilderManager()
-    {
-        return $this->builderManager;
+        return $this->runtimeCollections;
     }
 }

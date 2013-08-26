@@ -13,26 +13,34 @@ class File extends AbstractResolver
     protected $finder;
 
     /**
-     * @param array $options
+     * @var array
      */
-    public function __construct(array $options)
+    protected $result;
+
+    /**
+     * @return $this
+     */
+    public function reset()
     {
-        $this->options = new FileOptions($options);
+        $this->finder = null;
+        $this->result = null;
+        return $this;
     }
 
     /**
      * @return Finder
      */
-    public function getFileFinder()
+    public function getFinder()
     {
-        if (!$this->finder) {
+        if (!$this->finder instanceof Finder) {
             $this->finder = new Finder();
 
-            if ($this->options->getName()) {
-                $this->finder->name($this->options->getName());
+            if (isset($this->options['name'])) {
+                $this->finder->name($this->options['name']);
             }
 
-            foreach ($this->options->getPaths() as $path) {
+            $paths = isset($this->options['paths']) ? $this->options['paths'] : array();
+            foreach ($paths as $path) {
                 $this->finder->in($path);
             }
         }
@@ -44,10 +52,14 @@ class File extends AbstractResolver
      */
     public function resolve()
     {
-        if (0 === count($this->options->getPaths())) {
-            return new Result(new ArrayIterator(array()));
+        if (!$this->result) {
+            $paths = isset($this->options['paths']) ? $this->options['paths'] : array();
+            if (0 === count($paths)) {
+                $this->result = array();
+            } else {
+                $this->result = $this->getFinder()->getIterator();
+            }
         }
-
-        return new Result($this->getFileFinder()->getIterator());
+        return $this->result;
     }
 }

@@ -1,17 +1,55 @@
 <?php
 
-// You can change this to `twig` if you use ZfcTwig.
-$viewExtension = 'phtml';
+// An array of view extensions for the template map builder.
+$viewExtensions = array(
+    'phtml',
+    'twig'
+);
 
 return array(
     'spiffy_config' => array(
         // Enables Runtime configuration - disable in production.
         'enabled' => true,
 
+        // The cache file to output when building via CLI.
+        'cache_file' => 'config/autoload/module.spiffyconfig.local.php',
+
+        // The collections to use when building the cache.
+        'cache_collections' => array('default'),
+
+        // The collections to build and merge during runtime.
+        'runtime_collections' => array('default'),
+
+        // Collections are sets of builders identified by a name.
+        'collections' => array(
+            'default' => array(
+                'annotation' => array('route', 'service'),
+                'view'       => array('template'),
+            )
+        ),
+
+        // Builders works on resolvers to create the configuration files.
+        'builders' => array(
+            'route' => array(
+                'type' => 'route',
+            ),
+
+            'service' => array(
+                'type' => 'service',
+            ),
+
+            'template' => array(
+                'type' => 'template',
+                'options' => array(
+                    'extensions' => $viewExtensions
+                ),
+            )
+        ),
+
         // Resolvers locate files or information for builders to process.
         'resolvers' => array(
             'annotation' => array(
-                'type' => 'SpiffyConfig\Resolver\File',
+                'type' => 'file',
                 'options' => array(
                     'paths' => array(
                         'module/Application/src'
@@ -20,34 +58,15 @@ return array(
                 ),
             ),
 
-            $viewExtension => array(
-                'type' => 'SpiffyConfig\Resolver\File',
+            'view' => array(
+                'type' => 'file',
                 'options' => array(
                     'paths' => array(
                         'module/Application/view'
                     ),
-                    'name' => '*.' . $viewExtension
+                    'name' => '/.' . implode('|', $viewExtensions) . '$/'
                 ),
             ),
-        ),
-
-        // Collections what resolvers and builders work together.
-        'collections' => array(
-            'default' => array(
-                array(
-                    'resolver' => 'annotation',
-                    'builders' => array(
-                        'ControllerManager',
-                        'Routes',
-                    )
-                ),
-                array(
-                    'resolver' => $viewExtension,
-                    'builders' => array(
-                        'TemplateMap'
-                    )
-                )
-            )
         ),
     ),
 );

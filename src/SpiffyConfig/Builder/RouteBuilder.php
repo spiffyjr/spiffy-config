@@ -27,7 +27,7 @@ class RouteBuilder extends AbstractAnnotationBuilder
     /**
      * {@inheritDoc}
      */
-    public function build(Resolver\ResultInterface $result)
+    public function build($result)
     {
         /** @var \Symfony\Component\Finder\SplFileInfo $file */
         $config = new ArrayObject();

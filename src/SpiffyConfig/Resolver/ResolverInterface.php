@@ -7,12 +7,23 @@ use SpiffyConfig\Builder;
 interface ResolverInterface
 {
     /**
-     * @return ResultInterface
+     * @return $this
+     */
+    public function reset();
+
+    /**
+     * @return array|\Traversable
      */
     public function resolve();
 
     /**
-     * @return \Zend\Stdlib\AbstractOptions
+     * @param array $options
+     * @return $this
+     */
+    public function setOptions(array $options);
+
+    /**
+     * @return array
      */
     public function getOptions();
 }

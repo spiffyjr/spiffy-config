@@ -1,8 +1,8 @@
 <?php
 
-namespace SpiffyConfig\Config;
+namespace SpiffyConfig;
 
-class Collection
+class ConfigCollection
 {
     /**
      * @var array

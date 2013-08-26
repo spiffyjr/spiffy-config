@@ -33,28 +33,16 @@ return array(
     ),
 
     'spiffy_config' => array(
-        'collection_manager' => array(
-            'abstract_factories' => array(
-                'SpiffyConfig\Config\AbstractCollectionFactory',
-            ),
-        ),
-
-        'resolver_manager' => array(
-            'abstract_factories' => array(
-                'SpiffyConfig\Resolver\AbstractFactory'
-            ),
-        ),
-
         'collections' => array(
             'default' => array()
         ),
 
         'resolvers' => array(),
-
-        'handlers' => array(
-            'SpiffyConfig\Handler\Runtime'
-        ),
     ),
 
-    'service_manager' => include 'service.config.php'
+    'service_manager' => array(
+        'factories' => array(
+            'SpiffyConfig\ModuleOptions' => 'SpiffyConfig\ModuleOptionsFactory'
+        )
+    )
 );

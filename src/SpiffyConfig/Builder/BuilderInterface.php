@@ -2,13 +2,17 @@
 
 namespace SpiffyConfig\Builder;
 
-use SpiffyConfig\Resolver;
-
 interface BuilderInterface
 {
     /**
-     * @param Resolver\ResultInterface $result
+     * @param array|\Traversable $result
      * @return array
      */
-    public function build(Resolver\ResultInterface $result);
+    public function build($result);
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setOptions(array $options);
 }

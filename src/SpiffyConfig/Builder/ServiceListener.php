@@ -57,6 +57,10 @@ class ServiceListener extends AbstractListenerAggregate
                 $spec = &$spec[$part];
             }
 
+            if ($annotation instanceof Service\Factory && $annotation->value) {
+                $className = $annotation->value;
+            }
+
             $spec[$annotation->type][$name] = $className;
         }
     }

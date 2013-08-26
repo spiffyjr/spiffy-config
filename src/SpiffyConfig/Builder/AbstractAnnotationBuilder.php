@@ -3,10 +3,11 @@
 namespace SpiffyConfig\Builder;
 
 use Doctrine\Common\Annotations;
+use Doctrine\Common\Cache;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
 
-abstract class AbstractAnnotationBuilder implements BuilderInterface
+abstract class AbstractAnnotationBuilder extends AbstractBuilder
 {
     /**
      * @var Annotations\Reader
@@ -39,7 +40,10 @@ abstract class AbstractAnnotationBuilder implements BuilderInterface
     public function getAnnotationReader()
     {
         if (!$this->annotationReader) {
-            $this->annotationReader = new Annotations\AnnotationReader();
+            $this->annotationReader = new Annotations\CachedReader(
+                new Annotations\AnnotationReader(),
+                new Cache\ArrayCache()
+            );
         }
         return $this->annotationReader;
     }
