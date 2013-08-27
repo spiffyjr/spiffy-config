@@ -80,7 +80,8 @@ class RouteListener extends AbstractListenerAggregate
             return;
         }
 
-        $event->getParam('spec')['may_terminate'] = $annotation->mayTerminate;
+        $spec = $event->getParam('spec');
+        $spec['may_terminate'] = $annotation->mayTerminate;
     }
 
     /**
@@ -94,7 +95,7 @@ class RouteListener extends AbstractListenerAggregate
         }
 
         $spec            = $event->getParam('spec');
-        $spec['options'] = isset($spec['options']) ? $spec['options'] : [];
+        $spec['options'] = isset($spec['options']) ? $spec['options'] : array();
 
         $options                           = $annotation->options;
         $options['defaults']['controller'] = $annotation->controller;
@@ -123,7 +124,8 @@ class RouteListener extends AbstractListenerAggregate
         }
 
         if ($key && $annotation->value) {
-            $event->getParam('spec')['options'][$key] = $annotation->value;
+            $spec = $event->getParam('spec');
+            $spec['options'][$key] = $annotation->value;
         }
     }
 
@@ -147,7 +149,8 @@ class RouteListener extends AbstractListenerAggregate
             ));
         }
 
-        $event->getParam('spec')['type'] = $annotation->type;
+        $spec = $event->getParam('spec');
+        $spec['type'] = $annotation->type;
     }
 
     /**
