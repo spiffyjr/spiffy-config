@@ -32,14 +32,6 @@ return array(
         )
     ),
 
-    'spiffy_config' => array(
-        'collections' => array(
-            'default' => array()
-        ),
-
-        'resolvers' => array(),
-    ),
-
     'service_manager' => array(
         'factories' => array(
             'SpiffyConfig\ModuleOptions' => 'SpiffyConfig\ModuleOptionsFactory'

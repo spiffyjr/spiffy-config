@@ -12,7 +12,7 @@ return array(
         'enabled' => true,
 
         // The cache file to output when building via CLI.
-        'cache_file' => 'config/autoload/module.spiffyconfig.local.php',
+        'cache_file' => 'config/autoload/spiffyconfig.local.php',
 
         // The collections to use when building the cache.
         'cache_collections' => array('default'),

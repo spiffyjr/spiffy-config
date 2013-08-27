@@ -3,6 +3,7 @@
 namespace SpiffyConfig\Controller;
 
 use SpiffyConfig\ConfigManager;
+use SpiffyConfig\ModuleOptions;
 use Zend\Console\ColorInterface;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Stdlib\ArrayUtils;
@@ -14,6 +15,11 @@ class Cli extends AbstractActionController
      */
     protected $configManager;
 
+    /**
+     * @var ModuleOptions
+     */
+    protected $options;
+
     public function buildAction()
     {
         $this->clearCache();
@@ -23,7 +29,7 @@ class Cli extends AbstractActionController
         $console->writeLine('building cache, please wait...', ColorInterface::YELLOW);
 
         $options     = $this->getOptions();
-        $collections = $options['cache_collections'];
+        $collections = $options->getCacheCollections();
 
         if (!is_array($collections)) {
             $collections = array($collections);
@@ -34,7 +40,7 @@ class Cli extends AbstractActionController
             $config = ArrayUtils::merge($config, $this->getConfigManager()->configure($name));
         }
 
-        $cacheFile    = $options['cache_file'];
+        $cacheFile    = $options->getCacheFile();
         $fileContents = sprintf('<?php%sreturn %s;%s', PHP_EOL, var_export($config, true), PHP_EOL);
         file_put_contents($cacheFile, $fileContents);
 
@@ -56,7 +62,6 @@ class Cli extends AbstractActionController
      */
     public function setConfigManager(ConfigManager $configManager)
     {
-        $configManager->addHandler($this->getConfigWriter());
         $this->configManager = $configManager;
         return $this;
     }
@@ -67,18 +72,30 @@ class Cli extends AbstractActionController
     public function getConfigManager()
     {
         if (!$this->configManager instanceof ConfigManager) {
-            $this->configManager = ConfigManager::create($this->getOptions());
+            $this->configManager = ConfigManager::create($this->getOptions()->toArray());
         }
         return $this->configManager;
     }
 
     /**
-     * @return array
+     * @param ModuleOptions $options
+     * @return $this
+     */
+    public function setOptions(ModuleOptions $options)
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @return ModuleOptions
      */
     public function getOptions()
     {
-        $config = $this->getServiceLocator()->get('Configuration');
-        return $config['spiffy_config'];
+        if (!$this->options instanceof ModuleOptions) {
+            $this->setOptions($this->getServiceLocator()->get('SpiffyConfig\ModuleOptions'));
+        }
+        return $this->options;
     }
 
     /**
@@ -91,7 +108,7 @@ class Cli extends AbstractActionController
         $console->writeLine('clearing cache, please wait...', ColorInterface::YELLOW);
 
         $options = $this->getOptions();
-        $file    = $options['cache_file'];
+        $file    = $options->getCacheFile();
 
         if (file_exists($file)) {
             unlink($file);
