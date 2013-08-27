@@ -3,12 +3,8 @@
 namespace SpiffyConfig;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use SpiffyConfig\Builder\BuilderFactory;
-use SpiffyConfig\Resolver\ResolverFactory;
 use Zend\Console\Adapter\AdapterInterface;
 use Zend\Console\ColorInterface;
-use Zend\EventManager\EventInterface;
-use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
