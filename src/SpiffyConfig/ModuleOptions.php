@@ -16,6 +16,20 @@ class ModuleOptions extends AbstractOptions
     protected $enabled = true;
 
     /**
+     * If enabled cache is only rebuilt on runtime when the key is present in the query string.
+     *
+     * @var bool
+     */
+    protected $requireKey = true;
+
+    /**
+     * This is the key that's required to be part of the query string in order to generate a config.
+     *
+     * @var string
+     */
+    protected $key = 'spiffyconfig';
+
+    /**
      * The name of the file that's generated via the CLI for production usage. This file
      * needs to be available from your glob_path in application.config.php so it's automatically
      * merged with your application configuration at runtime.
@@ -183,5 +197,41 @@ class ModuleOptions extends AbstractOptions
     public function getRuntimeCollections()
     {
         return $this->runtimeCollections;
+    }
+
+    /**
+     * @param string $key
+     * @return $this
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * @param boolean $requireKey
+     * @return $this
+     */
+    public function setRequireKey($requireKey)
+    {
+        $this->requireKey = $requireKey;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getRequireKey()
+    {
+        return $this->requireKey;
     }
 }

@@ -34,7 +34,26 @@ return array(
 
     'service_manager' => array(
         'factories' => array(
-            'SpiffyConfig\ModuleOptions' => 'SpiffyConfig\ModuleOptionsFactory'
+            'SpiffyConfig\Collector\RebuildCollector' => 'SpiffyConfig\Collector\RebuildCollectorFactory',
+            'SpiffyConfig\ModuleOptions'              => 'SpiffyConfig\ModuleOptionsFactory'
         )
+    ),
+
+    'view_manager' => array(
+        'template_map' => array(
+            'zend-developer-tools/toolbar/rebuild' => __DIR__ . '/../view/zend-developer-tools/toolbar/rebuild.phtml'
+        )
+    ),
+
+    'zenddevelopertools' => array(
+        'collectors' => array(
+            'spiffy_config_rebuild' => 'SpiffyConfig\Collector\RebuildCollector',
+        ),
+
+        'toolbar' => array(
+            'entries' => array(
+                'spiffy_config_rebuild' => 'zend-developer-tools/toolbar/rebuild',
+            ),
+        ),
     )
 );

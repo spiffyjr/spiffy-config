@@ -41,24 +41,28 @@ class Module implements
     {
         $configListener = $event->getConfigListener();
         $config         = $configListener->getMergedConfig(false);
-        $spiffyConfig   = isset($config['spiffy_config']) ? $config['spiffy_config'] : array();
+        $options        = new ModuleOptions(isset($config['spiffy_config']) ? $config['spiffy_config'] : array());
 
-        if (!isset($spiffyConfig['enabled'])
-            || $spiffyConfig['enabled'] !== true
-        ) {
+        if ($options->getEnabled() !== true || ($options->getRequireKey() && !isset($_GET[$options->getKey()]))) {
             return;
         }
 
         AnnotationRegistry::registerAutoloadNamespace('SpiffyConfig\Annotation', array(__DIR__ . '/..'));
 
-        $manager     = ConfigManager::create($spiffyConfig);
-        $collections = isset($spiffyConfig['runtime_collections']) ? $spiffyConfig['runtime_collections'] : array();
+        $manager     = ConfigManager::create($options->toArray());
+        $collections = $options->getRuntimeCollections();
         $collections = is_array($collections) ? $collections : array($collections);
 
+        $spiffyConfig = array();
         foreach ($collections as $name) {
-            $config = ArrayUtils::merge($config, $manager->configure($name));
+            $spiffyConfig = ArrayUtils::merge($spiffyConfig, $manager->configure($name));
         }
-        $configListener->setMergedConfig($config);
+        $configListener->setMergedConfig(ArrayUtils::merge($config, $spiffyConfig));
+
+        if ($options->getRequireKey()) {
+            $fileContents = sprintf('<?php%sreturn %s;%s', PHP_EOL, var_export($spiffyConfig, true), PHP_EOL);
+            file_put_contents($options->getCacheFile(), $fileContents);
+        }
     }
 
     /**
