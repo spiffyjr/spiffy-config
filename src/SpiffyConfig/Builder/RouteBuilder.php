@@ -5,6 +5,7 @@ namespace SpiffyConfig\Builder;
 use ArrayObject;
 use ReflectionClass;
 use SpiffyConfig\Annotation\Route;
+use SpiffyConfig\Annotation\Controller;
 use SpiffyConfig\Resolver;
 use Zend\Code\Reflection\FileReflection;
 
@@ -65,13 +66,22 @@ class RouteBuilder extends AbstractAnnotationBuilder
             return;
         }
 
+        // Special variables set by \SpiffyConfig\Annotation\Controller\RouteParent which appends
+        // all children routes with the data in the annotation.
+        // This allows for setting defaults at the controller level which is handy for inheritance or traits.
+        $routeParentName   = '';
+        $routeParentAction = '';
+
         $controllerName   = $this->discoverControllerName($annotations);
         $controllerName   = $controllerName ?: $className;
         $routeAnnotations = array();
 
         // Collect controller level annotations
         foreach ($annotations as $annotation) {
-            if ($annotation instanceof Route\AbstractRoute) {
+            if ($annotation instanceof Controller\RouteParent) {
+                $routeParentName   = $annotation->value;
+                $routeParentAction = $annotation->action ?: 'index';
+            } elseif ($annotation instanceof Route\AbstractRoute) {
                 $annotation->controller = $controllerName;
                 $routeAnnotations[]     = $annotation;
             }
@@ -102,9 +112,19 @@ class RouteBuilder extends AbstractAnnotationBuilder
 
             $spec       = new ArrayObject();
             $parentName = $annotation->parent;
-            $routeName  = $this->discoverRouteName($annotation);
 
             $this->configureRoute($annotation, $className, $spec);
+
+            // Handle SpiffyConfig\Annotation\Controller\RouteParent overrides.
+            if ($routeParentName) {
+                if ($annotation->action == $routeParentAction) {
+                    $annotation->name = $routeParentName;
+                } else {
+                    $parentName = $routeParentName;
+                }
+            }
+
+            $routeName = $this->discoverRouteName($annotation);
 
             if ($parentName) {
                 $parts = explode('/', $parentName);
