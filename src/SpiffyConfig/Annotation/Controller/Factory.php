@@ -7,7 +7,7 @@ use SpiffyConfig\Annotation\Service;
 /**
  * @Annotation
  */
-class Factory extends Service\Invokable
+class Factory extends Service\Factory
 {
     /**
      * @var string
