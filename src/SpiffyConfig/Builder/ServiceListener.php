@@ -61,6 +61,10 @@ class ServiceListener extends AbstractListenerAggregate
                 $className = $annotation->value;
             }
 
+            if (null !== $annotation->shared) {
+                $spec['shared'][$name] = $annotation->shared;
+            }
+
             $spec[$annotation->type][$name] = $className;
         }
     }

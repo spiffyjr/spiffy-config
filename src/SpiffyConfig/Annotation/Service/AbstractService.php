@@ -12,6 +12,11 @@ abstract class AbstractService extends Annotation
     public $key = 'service_manager';
 
     /**
+     * @var null|bool
+     */
+    public $shared = null;
+
+    /**
      * @var string
      */
     public $type;
