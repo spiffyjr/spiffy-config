@@ -38,8 +38,6 @@ Below is a list of currently supported annotations. This list will be updated as
 to use the annotations you **must import them first**. Do this by putting the following at the top of your code,
 
 ```php
-<?php
-
 use SpiffyConfig\Annotation as Config;
 ```
 
@@ -156,6 +154,7 @@ class IndexController extends AbstractActionController
 
     /**
      * @Route\Literal("/bar", name="bar", parent="foo")
+     */
     public function barAction()
     {
         // ...
@@ -190,7 +189,7 @@ class IndexController extends AbstractActionController
 
     /**
      * Resolves to /foo and is named home/foo.
-
+     *
      * @Route\Literal("foo", name="foo")
      */
     public function fooAction()
