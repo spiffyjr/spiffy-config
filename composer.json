@@ -2,6 +2,7 @@
     "name": "spiffy/spiffy-config",
     "description": "ZF2 module that provides route annotations directly in controllers.",
     "homepage": "http://www.github.com/spiffyjr/spiffy-config.git",
+    "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.3.3",
         "doctrine/common": "2.*",
