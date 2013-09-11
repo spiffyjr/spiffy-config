@@ -1,162 +1,209 @@
-# SpiffyRoutes Module
+# SpiffyConfig Module
 
-SpiffyRoutes is a module intended to make setting up routes quicker by providing annotations that can be
-used directly on the controllers/actions themselves. SpiffyRoutes comes feature complete with caching and a
-CLI tool to warm/clear the cache as required.
-
-## Project Status
-
-[![Master Branch Build Status](https://secure.travis-ci.org/spiffyjr/spiffy-routes.png?branch=master)](http://travis-ci.org/spiffyjr/spiffy-routes)
-[![Coverage Status](https://coveralls.io/repos/spiffyjr/spiffy-routes/badge.png?branch=master)](https://coveralls.io/r/spiffyjr/spiffy-routes?branch=master)
+SpiffyConfig is a module designed to speed up configuration.
 
 ## Installation
 
-Installation of SpiffyRoutes uses composer. For composer documentation, please refer to
+Installation of SpiffyConfig uses composer. For composer documentation, please refer to
 [getcomposer.org](http://getcomposer.org/).
 
 ```sh
-php composer.phar require spiffy/spiffy-routes:dev-master
+php composer.phar require spiffy/spiffy-config:dev-master
 ```
 
-Then add `SpiffyRoutes` to your `config/application.config.php`
+Then add `SpiffyConfig` to your `config/application.config.php`
 
 Installation without composer is not officially supported, and requires you to install and autoload
 the dependencies specified in the `composer.json`.
 
+Finally, copy `config/spiffyconfig.global.php.dist` to `autoload/spiffyconfig.global.php` directory. This will setup
+the Application module out of the box.
+
+## Resolvers
+
+Resolvers pass information to builders so that the builders know what to work on.
+
+ * File: resolves files using Symfony's file finder.
+
+## Builders
+
+Builders take information from the resolvers and build configurations based on that information.
+ * RouteBuilder: reads route annotations and builds configuration via events.
+ * ServiceBuilder: reads service annotations and builds configuration via events.
+ * TemplateBuilder: takes files from the file resolver and builds a template_map from them.
+
 ## Supported Annotations
 
 Below is a list of currently supported annotations. This list will be updated as more annotations are supported. In order
-to use the annotations you **must important them first**. Do this by putting the following at the top of your code,
+to use the annotations you **must import them first**. Do this by putting the following at the top of your code,
 
 ```php
 <?php
 
-use SpiffyRoutes\Annotation as Route;
+use SpiffyConfig\Annotation as Config;
 ```
 
-This will let you use SpiffyRoute's annotations using `@Route` in your docblock.
+This will let you use SpiffyConfig's annotations using `@Config` in your docblock.
 
-### Root
+### Service
 
-The root annotation is used on the *controller* level and specifies the prefix to apply to all routes
-on actions inside the controller.
+Service annotations are found in the `SpiffyConfig\Annotation\Service` namespace and handle setting up invokables and
+factories on various service managers.
+
+Properties:
+  *    key: the key to use when defining the configuration (default: service_manager). You can use a pipe "|" to nest
+            the key in the configuration array, e.g., my|nested would set the services as:
+             ```php
+             array(
+                'my' => array(
+                    'nested' => array(
+                        // service configuration would go here
+                    )
+                )
+             )
+             ```
+  * shared: set the service as shared or not (default: null)
+  *   type: this is set by using the `SpiffyConfig\Annotation\Service\Factory` or
+            `SpiffyConfig\Annotation\Service\Invokable` annotation (default: factories/invokables repsectively)
+  *   name: the name to use for the service. If no name is specified the FQCN is used.
+
+There are several annotations that extend the service annotations and predefine the `key` property to save you the
+extra step. Each of these have a Factory and Invokable annotation available.
+
+Service Annotations:
+  * `SpiffyConfig\Annotation\Controller`: key set to `controllers`
+  * `SpiffyConfig\Annotation\Form`: key set to `form_elements`
+  * `SpiffyConfig\Annotation\Hydrator`: key set to `hydrators`
+  * `SpiffyConfig\Annotation\RouteManager`: key set to `route_manager`
 
 ```php
-<?php
+namespace Application\Service;
 
-use SpiffyRoutes\Annotation as Route;
+use SpiffyConfig\Annotation\Service;
 
 /**
- * @Route\Root("/my")
+ * This annotation will set the Mailer service using the service_manager key
+ * under the service name "Application\Service\Mailer". I could specify a name
+ * if I don't want to use the FQCN.
+ *
+ * @Service\Invokable
  */
-class MyController
+class Mailer implements ServiceLocatorAwareInterface
 {
-    /**
-     * @Route\Literal("/home")
-     */
-    public function indexAction()
-    {
-        // ... I resolve to /my/home
-    }
+    // ... implementation ...
 }
 ```
 
-### Literal
+```php
+namespace Application\Service;
 
-The literal annotation maps to the literal route type.
+use SpiffyConfig\Annotation\Service;
 
+/**
+ * This annotation will set the Mailer service using the service_manager key
+ * under the service name "mailer" and being built from the "Application\Service\MailerFactory"
+ * factory.
+ *
+ * @Service\Factory("Application\Service\MailerFactory", name="mailer")
+ */
+class Mailer implements ServiceLocatorAwareInterface
+{
+    // ... implementation ...
+}
+```
+
+### Route
+
+Route annotations handle setting up routes directly in your controllers. They can be set at the class level or the
+method level. If set on the class level you must specify the action that the route pertains to. If set directly on the
+method then the action is set for you.
+
+Currently, the following routes are available:
+
+* Generic: used to setup any type of route you want. Nothing is managed directly.
+* Literal: setup literal routes
+* Regex: setup regex routes.
+* Segment: setup segment routes.
+
+Example:
 
 ```php
 <?php
 
-use SpiffyRoutes\Annotation as Route;
+namespace Application\Controller;
 
-class MyController
+use SpiffyConfig\Annotation\Route;
+use Zend\Mvc\Controller\AbstractActionController;
+
+/**
+ * @Route\Literal("/", name="home", action="index")
+ */
+class IndexController extends AbstractActionController
 {
-    /**
-     * @Route\Literal("/home", name="index")
-     */
+    // This annotation is set on the controller level.
     public function indexAction()
     {
-        // ... I resolve to "/home", with name "index"
+        // ...
+    }
+
+    /**
+     * @Route\Segment("/foo/:id", name="foo", options={"constraints":{"id":"\d+"}}")
+     */
+    public function fooAction()
+    {
+        // ...
+    }
+
+    /**
+     * @Route\Literal("/bar", name="bar", parent="foo")
+    public function barAction()
+    {
+        // ...
     }
 }
 ```
 
-### Regex
+### Controller
 
-The literal annotation maps to the literal route type.
-
+Controllers have an additional `RouteParent` annotation other than the service annotations listed above. This
+annotation let's you set the parent for all actions in the current controller.
 
 ```php
-<?php
+namespace Application\Controller;
 
-use SpiffyRoutes\Annotation as Route;
+use SpiffyConfig\Annotation\Controller;
+use SpiffyConfig\Annotation\Route;
+use Zend\Mvc\Controller\AbstractActionController;
 
-class MyController
+/**
+ * @Controller\RouteParent("home", action="index")
+ */
+class IndexController extends AbstractActionController
 {
     /**
-     * @Route\Regex("/regex/(?<id>\d+)", spec="/regex/%id%")
+     * @Route\Literal("/")
      */
     public function indexAction()
     {
-        // ... I resolve to "/regex/<someid>"
+        // ...
+    }
+
+    /**
+     * Resolves to /foo and is named home/foo.
+
+     * @Route\Literal("foo", name="foo")
+     */
+    public function fooAction()
+    {
+        // ...
     }
 }
 ```
 
-### Segment
+## Options
 
-The literal annotation maps to the literal route type.
-
-
-```php
-<?php
-
-use SpiffyRoutes\Annotation as Route;
-
-class MyController
-{
-    /**
-     * @Route\Segment("/segment[/:id]", constraints={"id"="\d+"})
-     */
-    public function indexAction()
-    {
-        // ... I resolve to "/segment/<someid>", or /segment
-    }
-}
-```
-
-## Caching
-
-Caching is extremely important due to the amount of reflection required to parse the annotations. It's so important,
-in fact, that caching is *not* optional. You can, however, set the cache adapter to `Zend\Cache\Storage\Adapter\Memory`
-during development if you wish to rebuild the router configuration on every request.
-
-By default, caching is enabled using the `SpiffyRoutes\Cache` service which is a `Zend\Cache\Storage\AdapterFilesystem`
-with the cache path set to `data/spiffy-routes`.
-
-## Multiple Routes
-
-SpiffyRoutes supports multiple routes per index. To use them, simply add more annotations to your actions.
-
-```php
-<?php
-
-use SpiffyRoutes\Annotation as Route;
-
-class MyController
-{
-    /**
-     * @Route\Regex("/regex/(?<id>\d+)", spec="/regex/%id%")
-     * @Route\Segment("/segment[/:id]", constraints={"id"="\d+"})
-     */
-    public function indexAction()
-    {
-        // ... I resolve to "/segment/<someid>", or /segment, or /regex/<someid>
-    }
-}
-```
+All options are available in the [`SpiffyConfig\ModuleOptions`](https://github.com/spiffyjr/spiffy-config/blob/master/src/SpiffyConfig/ModuleOptions.php)
+class with detailed descriptions.
 
 ## CLI Tool
 
@@ -170,3 +217,8 @@ cause an automated route name to be generated based on a canonicalized version o
 
 For example, if you have a controller registered with the ControllerManager as `My\Controller` and are a adding a route
 to the `indexAction` the auto-generated route name would be `my_controller_index`.
+
+## Zend Developer Tools
+
+A toolbar button is provided if you are using ZendDeveloperTools which lists various SpiffyConfig information and allows
+you fast access to refreshing the page with the key set.
