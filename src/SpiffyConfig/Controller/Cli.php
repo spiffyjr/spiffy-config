@@ -22,6 +22,8 @@ class Cli extends AbstractActionController
 
     public function buildAction()
     {
+        AnnotationRegistry::registerAutoloadNamespace('SpiffyConfig\Annotation', array(__DIR__ . '/../../'));
+        
         $this->clearCache();
 
         /** @var \Zend\Console\Adapter\AdapterInterface $console */
