@@ -2,6 +2,7 @@
 
 namespace SpiffyConfig\Controller;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use SpiffyConfig\ConfigManager;
 use SpiffyConfig\ModuleOptions;
 use Zend\Console\ColorInterface;
