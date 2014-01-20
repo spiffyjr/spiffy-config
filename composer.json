@@ -5,14 +5,14 @@
     "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": "2.*",
-        "symfony/finder": "2.*",
-        "zendframework/zend-cache": "2.*",
-        "zendframework/zend-code": "2.*",
-        "zendframework/zend-console": "2.*",
-        "zendframework/zend-mvc": "2.*",
-        "zendframework/zend-serializer": "2.*",
-        "zendframework/zend-version": "2.*"
+        "doctrine/common": "~2.2",
+        "symfony/finder": "~2.2",
+        "zendframework/zend-cache": "~2.2",
+        "zendframework/zend-code": "~2.2",
+        "zendframework/zend-console": "~2.2",
+        "zendframework/zend-mvc": "~2.2",
+        "zendframework/zend-serializer": "~2.2",
+        "zendframework/zend-version": "~2.2"
     },
     "require-dev": {
         "phpunit/phpunit": "3.*",
@@ -25,5 +25,10 @@
             "SpiffyConfig": "src/",
             "SpiffyConfigTest": "test/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+	    "dev-develop": "1.x-dev"
+	}
     }
 }
