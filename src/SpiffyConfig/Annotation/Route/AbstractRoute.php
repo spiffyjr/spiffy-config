@@ -40,4 +40,9 @@ abstract class AbstractRoute extends Annotation
      * @var array
      */
     public $options = array();
+
+    /**
+     * @var int
+     */
+    public $priority;
 }
