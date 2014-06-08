@@ -154,7 +154,6 @@ class RouteListener extends AbstractListenerAggregate
         $spec['type'] = $annotation->type;
     }
 
-
     /**
      * @param EventInterface $event
      * @throws \RuntimeException
