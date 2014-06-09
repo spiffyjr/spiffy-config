@@ -24,6 +24,7 @@ class RouteListener extends AbstractListenerAggregate
         $this->listeners[] = $events->attach('configureRoute', array($this, 'onHandleOptions'));
         $this->listeners[] = $events->attach('configureRoute', array($this, 'onHandleRoute'));
         $this->listeners[] = $events->attach('configureRoute', array($this, 'onHandleType'));
+        $this->listeners[] = $events->attach('configureRoute', array($this, 'onHandlePriority'));
 
         $this->listeners[] = $events->attach('discoverControllerName', array($this, 'onDiscoverControllerName'));
         $this->listeners[] = $events->attach('discoverRouteName', array($this, 'onDiscoverRouteName'));
@@ -151,6 +152,25 @@ class RouteListener extends AbstractListenerAggregate
 
         $spec = $event->getParam('spec');
         $spec['type'] = $annotation->type;
+    }
+
+    /**
+     * @param EventInterface $event
+     * @throws \RuntimeException
+     */
+    public function onHandlePriority(EventInterface $event)
+    {
+        $annotation = $event->getParam('annotation');
+        if (!$annotation instanceof Route\AbstractRoute) {
+            return;
+        }
+
+        if (!$annotation->priority) {
+            return;
+        }
+
+        $spec = $event->getParam('spec');
+        $spec['priority'] = $annotation->priority;
     }
 
     /**
