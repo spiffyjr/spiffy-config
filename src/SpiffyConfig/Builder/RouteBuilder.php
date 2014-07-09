@@ -7,6 +7,7 @@ use ReflectionClass;
 use SpiffyConfig\Annotation\Route;
 use SpiffyConfig\Annotation\Controller;
 use SpiffyConfig\Resolver;
+use Zend\Code\Reflection\ClassReflection;
 use Zend\Code\Reflection\FileReflection;
 
 class RouteBuilder extends AbstractAnnotationBuilder
@@ -43,6 +44,11 @@ class RouteBuilder extends AbstractAnnotationBuilder
                 $fileRefl  = new FileReflection($filename);
                 $className = $fileRefl->getClass()->getName();
             } catch (\Exception $e) {
+                continue;
+            }
+
+            $classRefl = new ClassReflection($className);
+            if ($classRefl->isAbstract()) {
                 continue;
             }
 
